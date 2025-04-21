@@ -295,6 +295,17 @@ void Gravity() {
 	return;
 }
 
+void alphaCursorRender(int x,int y) {
+	//create a rectangle with his x,y width and height of a regular particle
+	SDL_Rect fillRect = {(x/particleSize)*particleSize,( y / particleSize) * particleSize, particleSize, particleSize };
+	//setting the render color but with a lower a value to make it transparent
+	SDL_SetRenderDrawColor(gRenderer, 0xCB, 0xBD, 0x93, 0x66);
+	//giving the order to do it
+
+	SDL_RenderFillRect(gRenderer, &fillRect);
+
+}
+
 
 int main(int argc, char* args[])
 {
@@ -349,14 +360,18 @@ int main(int argc, char* args[])
 					}
 
 				}
-				//if the mouse is down get the position of the mouse and try to place a particle there
+				//get the position of the mouse
+				int x;
+				int y;
+				SDL_GetMouseState(&x, &y);
+				
+				//if the mouse is down try to place a particle there
 				if (mouseDown) {
-					int x;
-					int y;
-					SDL_GetMouseState(&x, &y);
-					addParticle(x, y);
 
+					addParticle(x, y);
 				}
+				
+				
 
 				//Clear screen
 				SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -364,7 +379,7 @@ int main(int argc, char* args[])
 
 				
 				renderRectangles(sandParticles);
-			
+				alphaCursorRender(x, y);
 				
 
 				//Update screen
