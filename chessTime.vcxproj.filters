@@ -18,5 +18,22 @@
     <ClCompile Include="main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="particle.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="render.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="globals.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="particle.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="render.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
