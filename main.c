@@ -11,11 +11,16 @@
 #include <time.h>
 #include <stdlib.h>
 
+//defining a struct for the sand particle
 typedef struct  {
-	int x;
+	//positions
+	int x; 
 	int y;
+
+	//speed downwards
 	double velocity;
 
+	//colors
 	int r;
 	int g;
 	int b;
@@ -27,12 +32,18 @@ const int SCREEN_WIDTH = 1920;
 const int SCREEN_HEIGHT = 1080;
 
 
+//info about the particle
 
-const int particleSize = 20;
+//size of the particle
+#define particleSize 20
+
+//the brightness spectrum that the colors of the sand will be changed by(higher = more bright and more dark pixels)
 const int colorSpec = 7;
 
+//array with the size of the screen divided by the size of the pixel to keep the space cost to a minimum.
+SandParticle sandParticles[(1920 * 1080)/particleSize];
 
-SandParticle sandParticles[1920 * 1080];
+//a counter to the number of sand particles currently on screen.
 int numOfParticles = 0;
 
 //Starts up SDL and creates window
@@ -157,9 +168,13 @@ SDL_Texture* loadTexture(char* path)
 }
 
 void renderRectangles(SandParticle rects[]) {
+	//go through each particle on the list
 	for (int i = 0; i < numOfParticles; i++) {
-			SDL_Rect fillRect = { rects[i].x, rects[i].y, particleSize, particleSize };
+			//create a rectangle with his x,y width and height using the array
+			SDL_Rect fillRect = { rects[i].x, rects[i].y, particleSize, particleSize }; 
+			//setting the render color...
 			SDL_SetRenderDrawColor(gRenderer,rects[i].r, rects[i].g, rects[i].b, 0xFF);
+			//giving the order to do it
 			SDL_RenderFillRect(gRenderer, &fillRect);
 		
 		
@@ -167,9 +182,11 @@ void renderRectangles(SandParticle rects[]) {
 	return;
 
 }
-
+//if a particle is in the place you enter return true
 bool isOccupied(int x, int y) {
+	//go through each particle on the list
 	for (int i = 0; i < numOfParticles; i++) {
+		//the y is divided by the particle size and multiplied again is to make sure its an int so checking positions is easier.
 		if (sandParticles[i].x == x && (sandParticles[i].y / particleSize) *particleSize == y) {
 			return true; // Already a particle here
 		}
@@ -187,10 +204,13 @@ void addParticle(int x, int y) {
 		return; // Do not add overlapping particle
 	}
 
+	//setting all of the values
+
 	sandParticles[numOfParticles].x = x;
 	sandParticles[numOfParticles].y = y;
 	sandParticles[numOfParticles].velocity = 0;
 
+	//offseting the color by a random value.
 	double randomColorOffset = rand() % colorSpec - colorSpec / 2;
 	sandParticles[numOfParticles].r = 0xCB + randomColorOffset;
 	sandParticles[numOfParticles].g = 0xBD + randomColorOffset;
@@ -201,8 +221,11 @@ void addParticle(int x, int y) {
 	numOfParticles++;
 }
 
+//check if there is another particle below a point
 bool bottomCollision(int x, int y) {
+	//looping through every particle
 	for (int i = 0; i < numOfParticles; i++) {
+		//if the particle is not in the exact same position(meaning the same one), the particle is bellow them and the space between them is lower then the particleSize(indicating collision) then return true
 		if (sandParticles[i].y != y&& (double)sandParticles[i].y - y >0&&(double)sandParticles[i].y -y<= particleSize && sandParticles[i].x == x) {
 			return true;
 		}
@@ -216,25 +239,35 @@ bool bottomCollision(int x, int y) {
 
 
 void Gravity() {
+	//looping through every particle
 	for (int i = 0; i < numOfParticles; i++) {
+
+		//check if the particle is touching the ground
 		if (sandParticles[i].y >= SCREEN_HEIGHT- particleSize) {
 			sandParticles[i].y = SCREEN_HEIGHT- particleSize;
 			sandParticles[i].velocity = 0;
 			continue;
 		}
+		//check if the particle is touching another particle on the bottom
 		if (bottomCollision(sandParticles[i].x, sandParticles[i].y)) {
+			//fix its position
 			sandParticles[i].y = (sandParticles[i].y / particleSize) * particleSize;
 			
+			//reset the velocity only if its moving 
 			if (sandParticles[i].velocity != 0) {
 				sandParticles[i].velocity = 0;
 				continue;
 			}
+
+			//if there isnt a particle on the bottom left corner go there
 			if (sandParticles[i].x!=0 && !bottomCollision(sandParticles[i].x - particleSize, sandParticles[i].y)) {
 				sandParticles[i].x -= particleSize;
 				sandParticles[i].y += particleSize;
 				
 				continue;
 			}
+
+			//same for the right
 			if (sandParticles[i].x != SCREEN_WIDTH- particleSize &&!bottomCollision(sandParticles[i].x + particleSize, sandParticles[i].y)) {
 				sandParticles[i].x += particleSize;
 				sandParticles[i].y += particleSize;
@@ -243,11 +276,15 @@ void Gravity() {
 			continue;
 		}
 		
+		//apply velocity
 		sandParticles[i].y += sandParticles[i].velocity;
+
+		//make sure the velocity is not too big
 		if (sandParticles[i].velocity >= particleSize) {
 			sandParticles[i].velocity = particleSize;
 		}
 		else {
+			//increase it
 			sandParticles[i].velocity += 0.5f;
 
 		}
@@ -261,8 +298,10 @@ void Gravity() {
 
 int main(int argc, char* args[])
 {
+	//setup the random value generator
 	srand(time(NULL));
 
+	//setting up a timer
 	Uint64 lastUpdateTime = SDL_GetTicks64();
 	const Uint64 updateInterval = 16; // approx 60 times per second (1000ms / 60)
 
@@ -285,6 +324,8 @@ int main(int argc, char* args[])
 
 			//Event handler
 			SDL_Event e;
+
+			//is a mouse button down
 			bool mouseDown= false;
 			//While application is running
 			while (!quit)
@@ -296,15 +337,19 @@ int main(int argc, char* args[])
 					if (e.type == SDL_QUIT)
 					{
 						quit = true;
-					}else if(e.type ==SDL_MOUSEBUTTONDOWN){
+					}else 
+					//if a mouse button is pressed down set the value to true	
+					if(e.type ==SDL_MOUSEBUTTONDOWN){
 						mouseDown = true;
 			
 					}
+					//if up set to false
 					else if (e.type == SDL_MOUSEBUTTONUP) {
 						mouseDown = false;
 					}
 
 				}
+				//if the mouse is down get the position of the mouse and try to place a particle there
 				if (mouseDown) {
 					int x;
 					int y;
@@ -317,14 +362,19 @@ int main(int argc, char* args[])
 				SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
 				SDL_RenderClear(gRenderer);
 
+				
 				renderRectangles(sandParticles);
 			
 				
 
 				//Update screen
 				SDL_RenderPresent(gRenderer);
+
+				//get the current time
 				Uint64 currentTime = SDL_GetTicks64();
+				//compare the times between the start of the function to now to see if the wanted time has passed in order to keep the same speed on multiple framerates
 				if (currentTime - lastUpdateTime >= updateInterval) {
+					//reset the timer and call the gravity function
 					Gravity();
 					lastUpdateTime = currentTime;
 				}
