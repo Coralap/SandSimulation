@@ -170,7 +170,7 @@ void renderRectangles(SandParticle rects[]) {
 
 bool isOccupied(int x, int y) {
 	for (int i = 0; i < numOfParticles; i++) {
-		if (sandParticles[i].x == x && sandParticles[i].y == y) {
+		if (sandParticles[i].x == x && (sandParticles[i].y / particleSize) *particleSize == y) {
 			return true; // Already a particle here
 		}
 	}
