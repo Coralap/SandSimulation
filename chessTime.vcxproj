@@ -133,14 +133,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="globals.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="particle.c" />
     <ClCompile Include="render.c" />
+    <ClCompile Include="sdl_helpers.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="globals.h" />
     <ClInclude Include="particle.h" />
     <ClInclude Include="render.h" />
+    <ClInclude Include="sdl_helpers.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

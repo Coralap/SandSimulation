@@ -26,11 +26,7 @@ int main(int argc, char* args[])
         return 1;
     }
 
-    // Load media
-    if (!loadMedia()) {
-        printf("Failed to load media!\n");
-        return 1;
-    }
+
 
     // Main loop flag
     bool quit = false;
@@ -57,6 +53,25 @@ int main(int argc, char* args[])
             else if (e.type == SDL_MOUSEBUTTONUP) {
                 mouseDown = false;
             }
+            
+            else if (e.type == SDL_KEYDOWN ) {
+                switch (e.key.keysym.sym)
+                {
+                case SDLK_LEFTBRACKET:
+                    if (brushSize > 1) {
+                        brushSize -= 2;
+                    }
+                    
+                    break;
+                case SDLK_RIGHTBRACKET:
+                    brushSize += 2;
+                    break;
+
+                default:
+                    break;
+                }
+
+            }
         }
 
         // Get the position of the mouse
@@ -65,8 +80,22 @@ int main(int argc, char* args[])
 
         // If the mouse is down, try to place a particle there
         if (mouseDown) {
-            addParticle(x, y);
+            x = (x / particleSize) * particleSize;
+            y = (y / particleSize) * particleSize;
+            if (brushSize > 1) {
+                for (int i = -brushSize / 2; i < brushSize / 2; i++) {
+                    for (int j = -brushSize / 2; j < brushSize / 2; j++) {
+                        addParticle(x + i * particleSize, y + j * particleSize);
+                    }
+                }
+            }
+            else {
+                addParticle(x,y);
+            }
+
+            
         }
+
 
         // Clear screen
         SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);

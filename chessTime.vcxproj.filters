@@ -24,6 +24,12 @@
     <ClCompile Include="render.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="sdl_helpers.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="globals.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="globals.h">
@@ -33,6 +39,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="render.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sdl_helpers.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -11,5 +11,6 @@
 //size of the particle
 #define particleSize 20
 
+extern int brushSize;
 //the brightness spectrum that the colors of the sand will be changed by(higher = more bright and more dark pixels)
 #define colorSpec 7

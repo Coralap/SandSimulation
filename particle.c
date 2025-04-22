@@ -26,7 +26,8 @@ bool bottomCollision(int x, int y) {
     //looping through every particle
     for (int i = 0; i < numOfParticles; i++) {
         //if the particle is not in the exact same position(meaning the same one), the particle is bellow them and the space between them is lower then the particleSize(indicating collision) then return true
-        if (sandParticles[i].y != y && (double)sandParticles[i].y - y > 0 && (double)sandParticles[i].y - y <= particleSize && sandParticles[i].x == x) {
+        if (sandParticles[i].y != y && (double)sandParticles[i].y - y > 0 && (double)sandParticles[i].y - y <= particleSize && sandParticles[i].x == x&&sandParticles[i].velocity==0
+			) {
             return true;
         }
 
@@ -45,18 +46,20 @@ void addParticle(int x, int y) {
     if (isOccupied(x, y)) {
         return; // Do not add overlapping particle
     }
+	printf("x: %d     y:  %d\n", x, y);
 
     //setting all of the values
 
     sandParticles[numOfParticles].x = x;
     sandParticles[numOfParticles].y = y;
-    sandParticles[numOfParticles].velocity = 0;
+    sandParticles[numOfParticles].velocity = 0.1;
 
     //offseting the color by a random value.
     double randomColorOffset = rand() % colorSpec - colorSpec / 2;
     sandParticles[numOfParticles].r = 0xCB + randomColorOffset;
     sandParticles[numOfParticles].g = 0xBD + randomColorOffset;
     sandParticles[numOfParticles].b = 0x93 + randomColorOffset;
+
 
 
 
@@ -102,7 +105,6 @@ void Gravity() {
 
 		//apply velocity
 		sandParticles[i].y += sandParticles[i].velocity;
-
 		//make sure the velocity is not too big
 		if (sandParticles[i].velocity >= particleSize) {
 			sandParticles[i].velocity = particleSize;

@@ -13,6 +13,7 @@ typedef struct {
 
 	//colors
 	int r,g,b;
+
 } SandParticle;
 
 extern SandParticle sandParticles[];

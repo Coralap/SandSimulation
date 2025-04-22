@@ -20,11 +20,28 @@ void renderRectangles(SDL_Renderer* gRenderer,SandParticle rects[]) {
 
 void alphaCursorRender(SDL_Renderer* gRenderer,int x, int y) {
 	//create a rectangle with his x,y width and height of a regular particle
-	SDL_Rect fillRect = { (x / particleSize) * particleSize,(y / particleSize) * particleSize, particleSize, particleSize };
-	//setting the render color but with a lower a value to make it transparent
-	SDL_SetRenderDrawColor(gRenderer, 0xCB, 0xBD, 0x93, 0x66);
-	//giving the order to do it
+	x = (x / particleSize) * particleSize;
+	y = (y / particleSize) * particleSize;
+	if (brushSize > 1) {
+		for (int i = -brushSize / 2; i < brushSize / 2; i++) {
+			for (int j = -brushSize / 2; j < brushSize / 2; j++) {
+				SDL_Rect fillRect = { (x / particleSize) * particleSize + i * particleSize,(y / particleSize) * particleSize + j * particleSize, particleSize, particleSize };
+				//setting the render color but with a lower a value to make it transparent
+				SDL_SetRenderDrawColor(gRenderer, 0xCB, 0xBD, 0x93, 0x66);
+				//giving the order to do it
 
-	SDL_RenderFillRect(gRenderer, &fillRect);
+				SDL_RenderFillRect(gRenderer, &fillRect);
+			}
+		}
+	}
+	else {
+		SDL_Rect fillRect = { (x / particleSize) * particleSize,(y / particleSize) * particleSize, particleSize, particleSize };
+		//setting the render color but with a lower a value to make it transparent
+		SDL_SetRenderDrawColor(gRenderer, 0xCB, 0xBD, 0x93, 0x66);
+		//giving the order to do it
+
+		SDL_RenderFillRect(gRenderer, &fillRect);
+	}
+
 
 }
