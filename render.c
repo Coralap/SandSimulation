@@ -20,6 +20,7 @@ void renderRectangles(SDL_Renderer* gRenderer,SandParticle rects[]) {
 
 void alphaCursorRender(SDL_Renderer* gRenderer,int x, int y) {
 	//create a rectangle with his x,y width and height of a regular particle
+	//generate a square using the brush size and place particles there
 	x = (x / particleSize) * particleSize;
 	y = (y / particleSize) * particleSize;
 	if (brushSize > 1) {

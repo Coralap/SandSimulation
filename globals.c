@@ -1,2 +1,2 @@
 #include "globals.h"
-int brushSize = 10;
+int brushSize = 1;

@@ -57,12 +57,14 @@ int main(int argc, char* args[])
             else if (e.type == SDL_KEYDOWN ) {
                 switch (e.key.keysym.sym)
                 {
+                //if pressing left bracket key lower brushsize
                 case SDLK_LEFTBRACKET:
                     if (brushSize > 1) {
                         brushSize -= 2;
                     }
                     
                     break;
+                    //if pressing right bracket key inrease brushsize
                 case SDLK_RIGHTBRACKET:
                     brushSize += 2;
                     break;
@@ -80,6 +82,7 @@ int main(int argc, char* args[])
 
         // If the mouse is down, try to place a particle there
         if (mouseDown) {
+            //generate a square using the brush size and place particles there
             x = (x / particleSize) * particleSize;
             y = (y / particleSize) * particleSize;
             if (brushSize > 1) {

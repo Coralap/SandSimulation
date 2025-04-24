@@ -10,6 +10,8 @@ int numOfParticles = 0;
 
 //if a particle is in the place you enter return true
 bool isOccupied(int x, int y) {
+	
+	y = (y / particleSize) * particleSize;
     //go through each particle on the list
     for (int i = 0; i < numOfParticles; i++) {
         //the y is divided by the particle size and multiplied again is to make sure its an int so checking positions is easier.
@@ -22,17 +24,19 @@ bool isOccupied(int x, int y) {
 
 
 //check if there is another particle below a point
-bool bottomCollision(int x, int y) {
+SandParticle bottomCollision(int x, int y) {
     //looping through every particle
     for (int i = 0; i < numOfParticles; i++) {
         //if the particle is not in the exact same position(meaning the same one), the particle is bellow them and the space between them is lower then the particleSize(indicating collision) then return true
-        if (sandParticles[i].y != y && (double)sandParticles[i].y - y > 0 && (double)sandParticles[i].y - y <= particleSize && sandParticles[i].x == x&&sandParticles[i].velocity==0
+        if (sandParticles[i].y != y && (double)sandParticles[i].y - y > 0 && (double)sandParticles[i].y - y <= particleSize && sandParticles[i].x == x
 			) {
-            return true;
+
+            return sandParticles[i];
         }
 
     }
-    return false;
+	SandParticle nothing = { -1,0,0,0,0,0 };
+    return nothing;
 
 
 
@@ -46,7 +50,6 @@ void addParticle(int x, int y) {
     if (isOccupied(x, y)) {
         return; // Do not add overlapping particle
     }
-	printf("x: %d     y:  %d\n", x, y);
 
     //setting all of the values
 
@@ -76,18 +79,20 @@ void Gravity() {
 			continue;
 		}
 		//check if the particle is touching another particle on the bottom
-		if (bottomCollision(sandParticles[i].x, sandParticles[i].y)) {
+		SandParticle coll = bottomCollision(sandParticles[i].x, sandParticles[i].y);
+		if (coll.x!=-1) {
 			//fix its position
 			sandParticles[i].y = (sandParticles[i].y / particleSize) * particleSize;
+			
 
-			//reset the velocity only if its moving 
-			if (sandParticles[i].velocity != 0) {
-				sandParticles[i].velocity = 0;
-				continue;
-			}
-
+			
+			sandParticles[i].velocity = coll.velocity;
+			sandParticles[i].y = coll.y - particleSize;
 			//if there isnt a particle on the bottom left corner go there
-			if (sandParticles[i].x != 0 && !bottomCollision(sandParticles[i].x - particleSize, sandParticles[i].y)) {
+			coll = bottomCollision(sandParticles[i].x - particleSize, sandParticles[i].y);
+
+			if (sandParticles[i].x != 0 && (coll.x == -1) && coll.velocity == 0) {
+				printf("nigga %d\n", coll.velocity);
 				sandParticles[i].x -= particleSize;
 				sandParticles[i].y += particleSize;
 
@@ -95,7 +100,9 @@ void Gravity() {
 			}
 
 			//same for the right
-			if (sandParticles[i].x != SCREEN_WIDTH - particleSize && !bottomCollision(sandParticles[i].x + particleSize, sandParticles[i].y)) {
+			coll = bottomCollision(sandParticles[i].x + particleSize, sandParticles[i].y);
+			if (sandParticles[i].x != SCREEN_WIDTH - particleSize && (coll.x == -1)&&coll.velocity==0) {
+
 				sandParticles[i].x += particleSize;
 				sandParticles[i].y += particleSize;
 				continue;
