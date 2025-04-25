@@ -79,20 +79,19 @@ void Gravity() {
 			continue;
 		}
 		//check if the particle is touching another particle on the bottom
-		SandParticle coll = bottomCollision(sandParticles[i].x, sandParticles[i].y);
-		if (coll.x!=-1) {
+		SandParticle bottomColl = bottomCollision(sandParticles[i].x, sandParticles[i].y);
+		if (bottomColl.x!=-1) {
 			//fix its position
 			sandParticles[i].y = (sandParticles[i].y / particleSize) * particleSize;
 			
-
+			sandParticles[i].velocity = bottomColl.velocity;
+			sandParticles[i].y = bottomColl.y - particleSize;
 			
-			sandParticles[i].velocity = coll.velocity;
-			sandParticles[i].y = coll.y - particleSize;
-			//if there isnt a particle on the bottom left corner go there
-			coll = bottomCollision(sandParticles[i].x - particleSize, sandParticles[i].y);
 
-			if (sandParticles[i].x != 0 && (coll.x == -1) && coll.velocity == 0) {
-				printf("nigga %d\n", coll.velocity);
+			//if there isnt a particle on the bottom left corner go there
+			SandParticle coll = bottomCollision(sandParticles[i].x - particleSize, sandParticles[i].y);
+
+			if (sandParticles[i].x != 0 && (coll.x == -1) && bottomColl.velocity == 0) {
 				sandParticles[i].x -= particleSize;
 				sandParticles[i].y += particleSize;
 
@@ -101,26 +100,32 @@ void Gravity() {
 
 			//same for the right
 			coll = bottomCollision(sandParticles[i].x + particleSize, sandParticles[i].y);
-			if (sandParticles[i].x != SCREEN_WIDTH - particleSize && (coll.x == -1)&&coll.velocity==0) {
+			if (sandParticles[i].x != SCREEN_WIDTH - particleSize && (coll.x == -1)&& bottomColl.velocity==0) {
 
 				sandParticles[i].x += particleSize;
 				sandParticles[i].y += particleSize;
 				continue;
 			}
+			sandParticles[i].velocity = bottomColl.velocity;
+			sandParticles[i].y = bottomColl.y - particleSize;
 			continue;
 		}
 
 		//apply velocity
-		sandParticles[i].y += sandParticles[i].velocity;
+		if (bottomColl.velocity == 0) {
+			sandParticles[i].y += sandParticles[i].velocity;
+		}
 		//make sure the velocity is not too big
 		if (sandParticles[i].velocity >= particleSize) {
 			sandParticles[i].velocity = particleSize;
 		}
 		else {
 			//increase it
+
 			sandParticles[i].velocity += 0.5f;
 
 		}
+
 		//printf("particle: x= %d   y=%d   vel=%f   \n", sandParticles[i].x, sandParticles[i].y, sandParticles[i].velocity);
 	}
 
