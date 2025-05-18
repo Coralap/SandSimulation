@@ -14,11 +14,15 @@ typedef struct {
 	//colors
 	int r,g,b;
 
+	int index;
 } SandParticle;
 
 extern SandParticle sandParticles[];
+extern SandParticle particlesToUpdate[];
+
 extern int numOfParticles;
 
 void addParticle(int x, int y);
 bool isOccupied(int x, int y);
-void Gravity(void);
+void Step(void);
+void StepParticle(SandParticle* particle);

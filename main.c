@@ -116,8 +116,8 @@ int main(int argc, char* args[])
         // Compare the times between the last and now to see if update time has passed
         // This is to keep the same speed on multiple framerates
         if (currentTime - lastUpdateTime >= updateInterval) {
-            // Reset the timer and call the gravity function
-            Gravity();
+            // Reset the timer and call the STEP function
+            Step();
             lastUpdateTime = currentTime;
         }
     }

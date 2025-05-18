@@ -4,10 +4,10 @@
 
 //array with the size of the screen divided by the size of the pixel to keep the space cost to a minimum.
 SandParticle sandParticles[(SCREEN_WIDTH * SCREEN_HEIGHT) / particleSize];
-
+SandParticle particlesToUpdate[(SCREEN_WIDTH * SCREEN_HEIGHT) / particleSize];
 //a counter to the number of sand particles currently on screen.
 int numOfParticles = 0;
-
+const double epsilon = 1e-9;
 //if a particle is in the place you enter return true
 bool isOccupied(int x, int y) {
 	
@@ -57,6 +57,9 @@ void addParticle(int x, int y) {
     sandParticles[numOfParticles].y = y;
     sandParticles[numOfParticles].velocity = 0.1;
 
+	sandParticles[numOfParticles].index = numOfParticles;
+
+
     //offseting the color by a random value.
     double randomColorOffset = rand() % colorSpec - colorSpec / 2;
     sandParticles[numOfParticles].r = 0xCB + randomColorOffset;
@@ -65,72 +68,121 @@ void addParticle(int x, int y) {
 
 
 
+	//set the values for the updatelist
+	particlesToUpdate[numOfParticles].x = x;
+	particlesToUpdate[numOfParticles].y = y;
+	particlesToUpdate[numOfParticles].velocity = 0.1;
+
+	particlesToUpdate[numOfParticles].r =0;
+	particlesToUpdate[numOfParticles].g =0;
+	particlesToUpdate[numOfParticles].b =0;
+
+
+	particlesToUpdate[numOfParticles].index = numOfParticles;
+
+
 
     numOfParticles++;
 }
-void Gravity() {
+void Step() {
 	//looping through every particle
 	for (int i = 0; i < numOfParticles; i++) {
 
-		//check if the particle is touching the ground
-		if (sandParticles[i].y >= SCREEN_HEIGHT - particleSize) {
-			sandParticles[i].y = SCREEN_HEIGHT - particleSize;
-			sandParticles[i].velocity = 0;
-			continue;
-		}
-		//check if the particle is touching another particle on the bottom
-		SandParticle bottomColl = bottomCollision(sandParticles[i].x, sandParticles[i].y);
-		if (bottomColl.x!=-1) {
-			//fix its position
-			sandParticles[i].y = (sandParticles[i].y / particleSize) * particleSize;
-			
-			sandParticles[i].velocity = bottomColl.velocity;
-			sandParticles[i].y = bottomColl.y - particleSize;
-			
-
-			//if there isnt a particle on the bottom left corner go there
-			SandParticle coll = bottomCollision(sandParticles[i].x - particleSize, sandParticles[i].y);
-
-			if (sandParticles[i].x != 0 && (coll.x == -1) && bottomColl.velocity == 0) {
-				sandParticles[i].x -= particleSize;
-				sandParticles[i].y += particleSize;
-
-				continue;
-			}
-
-			//same for the right
-			coll = bottomCollision(sandParticles[i].x + particleSize, sandParticles[i].y);
-			if (sandParticles[i].x != SCREEN_WIDTH - particleSize && (coll.x == -1)&& bottomColl.velocity==0) {
-
-				sandParticles[i].x += particleSize;
-				sandParticles[i].y += particleSize;
-				continue;
-			}
-			sandParticles[i].velocity = bottomColl.velocity;
-			sandParticles[i].y = bottomColl.y - particleSize;
-			continue;
-		}
-
-		//apply velocity
-		if (bottomColl.velocity == 0) {
-			sandParticles[i].y += sandParticles[i].velocity;
-		}
-		//make sure the velocity is not too big
-		if (sandParticles[i].velocity >= particleSize) {
-			sandParticles[i].velocity = particleSize;
-		}
-		else {
-			//increase it
-
-			sandParticles[i].velocity += 0.5f;
-
-		}
-
+		StepParticle(&particlesToUpdate[i]);
+		
 		//printf("particle: x= %d   y=%d   vel=%f   \n", sandParticles[i].x, sandParticles[i].y, sandParticles[i].velocity);
 	}
 
 
 	return;
 }
+void updateParticles() {
+	for (int i = 0; i < numOfParticles; i++) {
+
+		if (particlesToUpdate[i].x != -1) {
+			sandParticles[particlesToUpdate[i].index].y = particlesToUpdate[i].y;
+			sandParticles[particlesToUpdate[i].index].x = particlesToUpdate[i].x;
+			sandParticles[particlesToUpdate[i].index].velocity = particlesToUpdate[i].velocity;
+		}
+
+	}
+	return;
+}
+void StepParticle(SandParticle *particle) {
+	//update the value of the update list if its in there
+	if (particle->x == -1) {
+		return;
+	}
+	
+
+
+	//check if the particle is touching the ground
+	if (particle->y >= SCREEN_HEIGHT - particleSize) {
+		particle->y = SCREEN_HEIGHT - particleSize;
+		particle->velocity = 0;
+		updateParticles();
+
+		particle->x = -1;
+
+		return;
+	}
+	//check if the particle is touching another particle on the bottom
+	SandParticle bottomColl = bottomCollision(particle->x, particle->y);
+	if (bottomColl.x != -1) {
+		//fix its position
+		particle->y = (particle->y / particleSize) * particleSize;
+
+		particle->velocity = bottomColl.velocity;
+		particle->y = bottomColl.y - particleSize;
+
+		updateParticles();
+		//if there isnt a particle on the bottom left corner go there
+		SandParticle coll = bottomCollision(particle->x - particleSize, particle->y);
+		if (particle->x != 0 && (coll.x == -1) && fabs(bottomColl.velocity) < epsilon) {
+			particle->x -= particleSize;
+			particle->y += particleSize;
+
+			updateParticles();
+			return;
+		}
+
+		//same for the right
+		coll = bottomCollision(particle->x + particleSize, particle->y);
+		if (particle->x != SCREEN_WIDTH - particleSize && (coll.x == -1)&& fabs(bottomColl.velocity) < epsilon) {
+
+			particle->x += particleSize;
+			particle->y += particleSize;
+
+			updateParticles();
+			return;
+		}
+		particle->velocity = bottomColl.velocity;
+		particle->y = bottomColl.y - particleSize;
+
+
+		updateParticles();
+		return;
+	}
+
+	//apply velocity
+	if (fabs(bottomColl.velocity) < epsilon) {
+		particle->y += particle->velocity;
+	}
+	//make sure the velocity is not too big
+	if (particle->velocity >= particleSize) {
+		particle->velocity = particleSize;
+	}
+	else {
+		//increase it
+
+		particle->velocity += 0.5f;
+
+	}
+
+
+	updateParticles();
+}
+
+
 
 
