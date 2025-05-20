@@ -15,6 +15,10 @@ typedef struct {
 	int r,g,b;
 
 	int index;
+
+	bool stayedInPlace;
+
+	
 } SandParticle;
 
 extern SandParticle sandParticles[];

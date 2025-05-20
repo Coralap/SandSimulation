@@ -58,7 +58,7 @@ void addParticle(int x, int y) {
     sandParticles[numOfParticles].velocity = 0.1;
 
 	sandParticles[numOfParticles].index = numOfParticles;
-
+	sandParticles[numOfParticles].stayedInPlace = false;
 
     //offseting the color by a random value.
     double randomColorOffset = rand() % colorSpec - colorSpec / 2;
@@ -76,6 +76,8 @@ void addParticle(int x, int y) {
 	particlesToUpdate[numOfParticles].r =0;
 	particlesToUpdate[numOfParticles].g =0;
 	particlesToUpdate[numOfParticles].b =0;
+
+	particlesToUpdate[numOfParticles].stayedInPlace = false;
 
 
 	particlesToUpdate[numOfParticles].index = numOfParticles;
@@ -96,6 +98,8 @@ void Step() {
 
 	return;
 }
+
+//update the renderlist from the physics list
 void updateParticles() {
 	for (int i = 0; i < numOfParticles; i++) {
 
@@ -108,12 +112,27 @@ void updateParticles() {
 	}
 	return;
 }
+
+//check if there is something on the bottom right or left of a position
+bool CheckSides(int x,int y) {
+	//same for the right
+	if (bottomCollision(x - particleSize, y).x != -1 && bottomCollision(x + particleSize, y).x != -1) {
+		return true;
+	}
+	
+
+
+	return false;
+
+}
+
 void StepParticle(SandParticle *particle) {
 	//update the value of the update list if its in there
 	if (particle->x == -1) {
 		return;
 	}
 	
+
 
 
 	//check if the particle is touching the ground
@@ -141,7 +160,7 @@ void StepParticle(SandParticle *particle) {
 		if (particle->x != 0 && (coll.x == -1) && fabs(bottomColl.velocity) < epsilon) {
 			particle->x -= particleSize;
 			particle->y += particleSize;
-
+			particle->stayedInPlace = false;
 			updateParticles();
 			return;
 		}
@@ -152,7 +171,7 @@ void StepParticle(SandParticle *particle) {
 
 			particle->x += particleSize;
 			particle->y += particleSize;
-
+			particle->stayedInPlace = false;
 			updateParticles();
 			return;
 		}
@@ -161,6 +180,16 @@ void StepParticle(SandParticle *particle) {
 
 
 		updateParticles();
+		//if there are particles on both sides  and the bottom is not moving stop updating this particle because it wont go anywhere also check if it was there for two frames to prevent freezing partices
+		if (fabs(bottomColl.velocity) < epsilon&&CheckSides(particle->x,particle->y)&&fabs(particle->velocity)<epsilon) {
+			if (particle->stayedInPlace) {
+				particle->x = -1;
+			}
+			else {
+				particle->stayedInPlace = true;
+			}
+			
+		}
 		return;
 	}
 
